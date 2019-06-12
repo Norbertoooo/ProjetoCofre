@@ -17,6 +17,7 @@ byte readCard[4];
 void setup()
 {
   Serial.begin(9600);
+  Serial.println("Iniciando monitor serial...");
   lcd.begin(16,2);
   lcd.init();                 // Inicializando o LCD
   lcd.backlight();            // Ligando o BackLight do LCD
@@ -27,7 +28,8 @@ void setup()
   pinMode(rele,OUTPUT);
 }
 void loop()
-{
+{ 
+  
   String conteudo = "";
     
     if ( ! mfrc522.PICC_IsNewCardPresent()) { //If a new PICC placed to RFID reader continue
@@ -43,24 +45,37 @@ void loop()
     conteudo.concat(String(mfrc522.uid.uidByte[i], HEX));
     lcd.print(mfrc522.uid.uidByte[i], HEX);
   }
+  
   conteudo.toUpperCase();
+  
+  Serial.println(conteudo);
+  
    if (conteudo.substring(1) == "CD 53 43 73")
   {
     lcd.clear();
     lcd.setCursor(0,1);
     lcd.println("Liberado");
     digitalWrite(rele,HIGH);
-    delay(1000);
-  }
-    if (conteudo.substring(1) == "21 39 3E 2E")
-  {
-    lcd.clear();
-    lcd.setCursor(0,1);
-    lcd.println("fechado");
+    delay(5000);
     digitalWrite(rele,LOW);
-    delay(1000);
-  }
-  
+    delay(500);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Sistema de cofre");
+    
+  }else{
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.println("Tag:" + conteudo);
+    lcd.setCursor(0,1);
+    lcd.println("Tag invalida");
+    delay(1500);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Sistema de cofre");
+    
+    }
+      
   delay(1000);  
 }
 
